@@ -4,6 +4,8 @@ __pycache__/
 *.pyo
 *.pyd
 
+*.pkl
+
 # Ignore virtual environment directories
 venv/
 env/

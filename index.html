@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Network traffic analysis system</title>
+  <link rel="stylesheet" href="./static/css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios@0.21.1/dist/axios.min.js"></script>
+</head>
+
+<body>
+  <div id="app">
+    <h1 style="text-align: center;">Network traffic analysis system</h1>
+    <div id="head">
+      <img src="./static/photo/back1.jpeg" alt="" style="display: block; margin: 0 auto;">
+    </div>
+    <div id="bottom">
+      <input type="file" ref="fileInput" @change="handleFileUpload" style="display: none;" />
+      
+      <button @click="triggerFileSelect">Choose File</button>
+      <button @click="submitFile" :disabled="!selectedFile">Upload File</button>
+      <button v-if="selectedFile" @click="cancelFile">Cancel File</button>
+      
+      <p>{{ fileMessage }}</p>
+    </div>
+  </div>
+
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        selectedFile: null,
+        fileMessage: 'No file selected.'
+      },
+      methods: {
+        triggerFileSelect() {
+          this.$refs.fileInput.click(); // 触发文件选择框的点击事件
+        },
+        handleFileUpload(event) {
+          this.selectedFile = event.target.files[0];
+          if (this.selectedFile) {
+            this.fileMessage = `Selected file: ${this.selectedFile.name}`;
+          }
+        },
+        submitFile() {
+          if (this.selectedFile) {
+            const formData = new FormData();
+            formData.append('file', this.selectedFile);
+
+            // Replace with your actual API endpoint
+            axios.post('http://127.0.0.1:5001/analysis', formData, {
+              headers: {
+                'Content-Type': 'multipart/form-data'
+              }
+            })
+            .then(response => {
+              console.log('File uploaded successfully:', response.data);
+              alert('File uploaded successfully!');
+              this.resetFileInput();
+            })
+            .catch(error => {
+              console.error('Error uploading file:', error);
+              alert('Failed to upload file.');
+            });
+          } else {
+            alert('Please select a file to upload.');
+          }
+        },
+        cancelFile() {
+          this.resetFileInput();
+          this.fileMessage = 'No file selected.';
+        },
+        resetFileInput() {
+          this.selectedFile = null;
+          this.$refs.fileInput.value = '';
+        }
+      }
+    });
+  </script>
+</body>
+
+</html>
